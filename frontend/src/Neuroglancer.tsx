@@ -1,13 +1,16 @@
 import './App.css'
 import "neuroglancer";
-import {setupDefaultViewer} from "neuroglancer/unstable/ui/default_viewer_setup.js";
 
-function App() {
-    setupDefaultViewer();
-    return (
-        <>
-        </>
-    )
+interface NeuroglancerProps {
+    viewer: any;
 }
 
-export default App
+function Neuroglancer({ viewer }: NeuroglancerProps) {
+    if (!viewer) {
+        return null;
+    }
+
+    return <div className="w-full h-full" />;
+}
+
+export default Neuroglancer;
