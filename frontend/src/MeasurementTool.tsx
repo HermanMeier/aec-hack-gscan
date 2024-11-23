@@ -7,18 +7,37 @@ interface Point {
     z: number;
 }
 
-interface MeasurementToolProps {
-    mousePosition: Point;
-    isActive: boolean;
-    viewer: {
-        mouseState: {
-            position: [number, number, number] | null;
-            changed: {
-                add: (callback: () => void) => void;
-                remove: (callback: () => void) => void;
+interface CoordinateSpace {
+    scales: number[];
+    units: string[];
+}
+
+interface DisplayDimensions {
+    coordinateSpace: CoordinateSpace;
+}
+
+interface Viewer {
+    displayDimensionRenderInfo: {
+        displayDimensions: {
+            value: {
+                coordinateSpace: CoordinateSpace;
             };
         };
     };
+    mouseState: {
+        position: [number, number, number] | null;
+    };
+    coordinateSpace: {
+        value: {
+            units: string[];
+        };
+    };
+}
+
+interface MeasurementToolProps {
+    mousePosition: Point;
+    isActive: boolean;
+    viewer: Viewer;
 }
 
 export default function MeasurementTool({ mousePosition, isActive, viewer }: MeasurementToolProps) {
@@ -27,17 +46,16 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
     const [endPoint, setEndPoint] = useState<Point | null>(null);
     const [isMeasuring, setIsMeasuring] = useState(false);
     const [temporaryEndPoint, setTemporaryEndPoint] = useState<Point | null>(null);
-    const [isMouseDown, setIsMouseDown] = useState(false);
 
     const calculateDistance = useCallback((point1: Point, point2: Point): number => {
-        const dx = point2.x - point1.x;
-        const dy = point2.y - point1.y;
-        const dz = point2.z - point1.z;
+        const scales = viewer.displayDimensionRenderInfo.displayDimensions.value.coordinateSpace.scales;
+        const dx = (point2.x - point1.x) * scales[0];
+        const dy = (point2.y - point1.y) * scales[1];
+        const dz = (point2.z - point1.z) * scales[2];
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
-    }, []);
+    }, [viewer]);
 
-    // Only update temporary end point when actually measuring
-    useEffect(() => {
+    const handleMouseMove = useCallback((e: MouseEvent) => {
         if (isMeasuring && viewer.mouseState.position) {
             const [x, y, z] = viewer.mouseState.position;
             setTemporaryEndPoint({ x, y, z });
@@ -57,21 +75,21 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
             setEndPoint(currentPoint);
             setIsMeasuring(false);
         }
-
-        setIsMouseDown(false);
-    }, [isActive, isMouseDown, startPoint, isMeasuring, viewer.mouseState.position]);
+    }, [isActive, startPoint, isMeasuring, viewer.mouseState.position]);
 
     useEffect(() => {
         if (!isActive) return;
 
-        // Add event listeners to the document
+        if (isMeasuring) {
+            document.addEventListener('mousemove', handleMouseMove);
+        }
         document.addEventListener('mouseup', handleMouseUp);
 
         return () => {
-            // Clean up event listeners
+            document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isActive, handleMouseUp]);
+    }, [isActive, isMeasuring, handleMouseMove, handleMouseUp]);
 
     const handleReset = useCallback(() => {
         setStartPoint(null);
@@ -87,25 +105,25 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
 
         if (isMeasuring && startPoint && temporaryEndPoint) {
             const distance = calculateDistance(startPoint, temporaryEndPoint);
-            return `Current distance: ${distance.toFixed(2)} units`;
+            return `Current distance: ${distance.toFixed(6)} ${viewer.coordinateSpace.value.units[0]}`;
         }
 
         if (startPoint && endPoint) {
             const distance = calculateDistance(startPoint, endPoint);
-            return `Final distance: ${distance.toFixed(2)} units`;
+            return `Final distance: ${distance.toFixed(6)} ${viewer.coordinateSpace.value.units[0]}`;
         }
 
-        return "Click to set end point";
-    }, [startPoint, endPoint, temporaryEndPoint, isMeasuring, calculateDistance]);
+        return `Current distance: 0 ${viewer.coordinateSpace.value.units[0]}`;
+    }, [startPoint, endPoint, temporaryEndPoint, isMeasuring, calculateDistance, viewer.coordinateSpace.value.units]);
 
     return (
         <div className="fixed bottom-4 right-4 flex flex-col items-end gap-4">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`p-3 text-white rounded-full shadow-lg transition-colors ${
+                className={`p-3 rounded-full shadow-lg transition-colors ${
                     isActive
-                        ? 'bg-blue-600 hover:bg-blue-700'
-                        : 'bg-gray-400 cursor-not-allowed'
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-gray-400 text-white/50 cursor-not-allowed'
                 }`}
                 title={isActive ? "Measurement Tool" : "Measurement Tool (Disabled)"}
             >
@@ -113,7 +131,7 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
             </button>
 
             {isOpen && (
-                <div className="w-64 bg-black/50 rounded-lg shadow-lg overflow-hidden">
+                <div className="w-64 bg-black/50 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
                     <div className="flex items-center justify-between p-3 border-b border-white/10">
                         <h3 className="text-white font-semibold text-sm">Measurement Tool</h3>
                         <button

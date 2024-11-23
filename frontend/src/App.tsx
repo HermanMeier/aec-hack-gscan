@@ -41,6 +41,7 @@ function App() {
 
     return (
         <div className="relative w-full h-screen">
+            {/*<Neuroglancer viewer={viewer} />*/}
             {viewer && (
                 <MeasurementTool
                     mousePosition={mousePosition}
