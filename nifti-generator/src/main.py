@@ -32,7 +32,7 @@ def convert_numpy_to_nifti(data: np.ndarray, output_file: str, original_affine: 
     """
     data = data.astype(np.float32)
 
-    # Affinity matrix used to give real
+    # Affinity matrix used to give real world size to voxels
     affine = np.eye(4) if original_affine is None else original_affine
 
     nifti_img = nib.Nifti1Image(data, affine)
