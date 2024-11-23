@@ -16,10 +16,10 @@ The problem is that the result muon tomography voxel models are very large (10 t
 
 ### Solution
 
-1. Convert voxel data to NIFTI
-2. Precomputing slices of voxel data
-3. Serving the precomputed slices on an HTTP server
-4. Running the [`neuroglancer`](https://github.com/google/neuroglancer) frontend
+1. [Convert voxel data to NIFTI](#1-convert-voxel-data-to-nifti)
+2. [Precomputing slices of voxel data](#2-precomputing-slices-of-voxel-data)
+3. [Serving the precomputed slices on an HTTP server](#3-serving-the-precomputed-slices-on-an-http-server)
+4. [Run the GScan Infra Vision + `neuroglancer` frontend](#4-run-the-gscan-infra-vision--neuroglancer-frontend)
 
 # 1. Convert voxel data to NIFTI
 
@@ -174,4 +174,25 @@ find 80mm/ -type f -name '*.gz' -exec gzip -d {} +
 
 # 3. Serving the precomputed slices on an HTTP server
 
-# 4. Running the [`neuroglancer`](https://github.com/google/neuroglancer) frontend
+# 4. Run the GScan Infra Vision + [`neuroglancer`](https://github.com/google/neuroglancer) frontend
+
+Frontend code for visualizing slices of large voxel spaces
+
+## Requirements
+
+* [Node 20](https://nodejs.org/en)
+
+## Getting started
+
+Clean install of Node packages:
+1. `npm ci`
+
+There is a gotcha with running the frontend  
+
+2. `npm run build`
+3. `npm run preview`
+
+## Developing
+
+* `npm ci`
+* `npm run dev`
