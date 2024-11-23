@@ -56,92 +56,33 @@ volume-to-precomputed \
 ```bash
 jq '.data_type = "uint8"' <output-dir-name>/info_fullres.json > tmp.json && mv tmp.json <output-dir-name>/info_fullres.json
 ```
-2. Generating scales info
+2. Generating scales info.
 ```bash
 generate-scales-info <output-dir-name>/info_fullres.json <output-dir-name>/
+```
 3. Doing the precomputation
-```bash
-volume-to-precomputed <input-nifti-file-path>.nii.gz <output-dir-name>/
-```
+- ```bash
+  volume-to-precomputed --flat --no-gzip <input-nifti-file-path>.nii.gz <output-dir-name>/
+  ```
+  1. The flag `--flat` ensures that the file tree of each scale is flattened, so that
+  the output files are in the format `scale/64-119_0-64_64-126`, instead of
+  `scale/64-119/0-64/64-126` (nested)
+  2. The flag `--no-gzip` ensures that the chunks are not compressed.
+
+
 4. Computing scales
-```bash
-compute-scales <output-dir-name>/
-```
+- ```bash
+  compute-scales --flat --no-gzip <output-dir-name>/
+  ```
+  1. The flag `--flat` ensures that the file tree of each scale is flattened, so that
+  the output files are in the format `scale/64-119_0-64_64-126`, instead of
+  `scale/64-119/0-64/64-126` (nested)
+  2. The flag `--no-gzip` ensures that the chunks are not compressed.
 
-Technically, you can also supply a `--flat` option to `volume-to-precomputed`,
-which should generate a flat file tree as desired. But, even if that doesn't
-work, the next step shows how to flatten the file tree.
-
-It also may be the case that this step produces `.gzip` chunk files. That may
-have something to do with the fact that we use a `.gzip` NIFTI input file.
-
-
-### Flattening
-This step shows how to flatten a scale directory. For example, given
-the following file tree:
-
-```
-80mm
-  |-0-64
-  |  |-0-64
-  |  |  |-0-64.gz
-  |  |  |-64-126.gz
-  |  |-64-126
-  |  |  |-0-64.gz
-  |  |  |-64-126.gz
-  |-64-119
-  |  |-0-64
-  |  |  |-0-64.gz
-  |  |  |-64-126.gz
-  |  |-64-126
-  |  |  |-0-64.gz
-  |  |  |-64-126.gz
-```
-
-we can produce the desired output running the following script `flatten.sh` by
-running `./flatten.sh 80mm/`
-
-```bash
-#!/bin/bash
-
-# check if a directory is provided
-if [ -z "$1" ]; then
-  echo "usage: $0 <directory>"
-  exit 1
-fi
-
-input_dir="$1"
-
-# verify the directory exists
-if [ ! -d "$input_dir" ]; then
-  echo "error: '$input_dir' is not a valid directory."
-  exit 1
-fi
-
-# function to flatten files
-flatten_directory() {
-  local dir="$1"
-  find "$dir" -type f | while read -r file; do
-    # get the relative path, replace '/' with '_', and move file to root of input_dir
-    relative_path="${file#$dir/}"
-    flattened_name="${relative_path//\//_}"
-    mv "$file" "$dir/$flattened_name"
-  done
-
-  # remove empty directories
-  find "$dir" -type d -empty -delete
-}
-
-# execute the flattening
-flatten_directory "$input_dir"
-
-echo "flattening completed."
-```
-
-
-### Unzipping
-
-In case the files are zipped, we can simply run the oneliner
-```bash
-find 80mm/ -type f -name '*.gz' -exec gzip -d {} +
-```
+5. (Optional) Converting the raw chunks to compressed JPEG
+    1. `generate-scales-info --encoding=jpeg <output-dir-name>/info jpeg/`
+        1. This produces the following warning, which we do not understand at
+           the moment.
+             > WARNING: the source info JSON contains multiple scales, only the
+             > first one will be used.
+    2. `convert-chunks --flat <output-dir-name>/ jpeg/`
