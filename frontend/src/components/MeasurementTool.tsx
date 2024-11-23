@@ -12,10 +12,6 @@ interface CoordinateSpace {
     units: string[];
 }
 
-interface DisplayDimensions {
-    coordinateSpace: CoordinateSpace;
-}
-
 interface Viewer {
     displayDimensionRenderInfo: {
         displayDimensions: {

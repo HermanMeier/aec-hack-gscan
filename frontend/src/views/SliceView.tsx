@@ -1,5 +1,5 @@
 import "neuroglancer";
-import MeasurementTool from "../MeasurementTool.tsx";
+import MeasurementTool from "../components/MeasurementTool.tsx";
 import {useEffect, useMemo, useState} from "react";
 import {setupDefaultViewer} from "neuroglancer/unstable/ui/default_viewer_setup";
 
@@ -15,10 +15,7 @@ function SliceView() {
     const [viewer, setViewer] = useState<any>(null);
     const newViewer = useMemo(() => setupDefaultViewer(), []);
 
-    console.log('creating slice view')
-
     useEffect(() => {
-
         setViewer(newViewer);
 
         const handleMouseStateChange = () => {
@@ -39,6 +36,10 @@ function SliceView() {
             newViewer.dispose();
         };
     }, [newViewer]);
+
+    useEffect(() => {
+        document.title = "GScan Infra Vision - AEC Hackathon Munich"; // Set the tab name to "Test"
+    }, []);
 
     return (
         <>
