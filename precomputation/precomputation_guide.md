@@ -47,7 +47,7 @@ We base our approach on this
 ```bash
 volume-to-precomputed \
     --generate-info \
-    <input-nifti-file-name>.nii.gz \
+    <input-nifti-file-path>.nii.gz \
     <output-dir-name>/`
 ```
 2. Generating scales info
@@ -55,7 +55,7 @@ volume-to-precomputed \
 generate-scales-info <output-dir-name>/info_fullres.json <output-dir-name>/
 3. Doing the precomputation
 ```bash
-volume-to-precomputed <input-nifti-file-name>.nii.gz <output-dir-name>/
+volume-to-precomputed <input-nifti-file-path>.nii.gz <output-dir-name>/
 ```
 4. Computing scales
 ```bash
