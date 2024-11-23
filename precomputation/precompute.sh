@@ -45,7 +45,6 @@ log "INFO" "Starting script execution."
 
 if [ ! -d "$output_dir_path" ]; then
   log "INFO" "Output directory not found. Creating and processing: $output_dir_path"
-
   log "INFO" "Generating info for $input_nifti_file_path"
   if ! volume-to-precomputed --generate-info "$input_nifti_file_path" "$output_dir_path/"; then
     error_exit "Failed to generate info for $input_nifti_file_path"
@@ -71,7 +70,6 @@ if [ ! -d "$output_dir_path" ]; then
   if ! compute-scales "$output_dir_path/"; then
     error_exit "Failed to compute scales."
   fi
-
 else
   log "INFO" "Output directory already exists: $output_dir_path. Skipping processing."
 fi

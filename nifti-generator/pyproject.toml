@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "nifti-generator"
+version = "0.1.0"
+description = "A generator to convert numpy pickle files to nifti"
+authors = ["Hendrig Sellik <hendrig.sellik@gscan.eu>"]
+readme = "README.md"
+packages = [
+    { include = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "~3.11"
+numpy = "^1.26.4"
+nibabel = "^5.2.1"
+click = "^8.1.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+nifti-generator = "src.main:cli"
