@@ -62,12 +62,12 @@ if [ ! -d "$output_dir_path" ]; then
   fi
 
   log "INFO" "Running precomputation"
-  if ! volume-to-precomputed "$input_nifti_file_path" "$output_dir_path/"; then
+  if ! volume-to-precomputed --flat --no-gzip "$input_nifti_file_path" "$output_dir_path/"; then
     error_exit "Failed to run precomputation."
   fi
 
   log "INFO" "Computing scales"
-  if ! compute-scales "$output_dir_path/"; then
+  if ! compute-scales --flat --no-gzip "$output_dir_path/"; then
     error_exit "Failed to compute scales."
   fi
 else
@@ -81,32 +81,5 @@ if ! jq ".scales[].encoding" "$output_dir_path/info" | grep -q jpeg; then
   generate-scales-info --encoding=jpeg "$output_dir_path"/info jpeg/
   convert-chunks --flat "$output_dir_path"/ jpeg/
 fi
-
-flatten_directory() {
-  local dir="$1"
-  log "INFO" "Flattening directory: $dir"
-  find "$dir" -type f | while read -r file; do
-    local relative_path="${file#"$dir"/}"
-    local flattened_name="${relative_path//\//_}"
-    mv "$file" "$dir/$flattened_name" || error_exit "Failed to move $file to $dir/$flattened_name"
-  done
-
-  find "$dir" -type d -empty -delete || error_exit "Failed to remove empty directories in $dir"
-}
-
-folders=$(find "$output_dir_path" -maxdepth 1 -mindepth 1 -type d)
-for folder in $folders; do
-  flatten_directory "$folder"
-done
-
-decompress_gz_in_folder() {
-  local dir="$1"
-  log "INFO" "Decompressing files in folder: $dir"
-  find "$dir" -type f -name '*.gz' -exec gzip -d {} + || error_exit "Failed to decompress files in $dir"
-}
-
-find "$output_dir_path" -type d | while read -r folder; do
-  decompress_gz_in_folder "$folder"
-done
 
 log "INFO" "Script execution completed successfully."
