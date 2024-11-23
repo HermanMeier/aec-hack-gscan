@@ -9,13 +9,15 @@ import numpy as np
 
 def main(neuroglancer_viewer_state):
     # Path to pkl file with Muon scan scatter angle data [milliradian] with shape (951, 1001, 1001)
-    pkl_path = Path.cwd() / "data" / "aec_hackathon_gscan_example_data.pkl"
+    data_dir = Path.cwd() / "data"
+    file_name = "aec_hackathon_gscan_example_smaller_data.pkl"
+    pkl_path = data_dir / file_name
 
     print(f"Loading scatter angle data from {pkl_path} into memory...")
     with open(pkl_path, "rb") as f:
         scatter_angle = np.load(f, allow_pickle=True)
 
-    print(scatter_angle.shape)
+    scatter_angle = scatter_angle.astype(np.uint8)
 
     print("Adding dimensions to viewer...")
     dimensions = neuroglancer.CoordinateSpace(
@@ -29,10 +31,10 @@ def main(neuroglancer_viewer_state):
         layer=neuroglancer.LocalVolume(
             data=scatter_angle,
             dimensions=neuroglancer.CoordinateSpace(
-                names=["Scatter Angle", "x", "y", "z"],
-                units=["rad/s", "cm", "cm", "cm"],
+                names=["x", "y", "z"],
+                units=["cm", "cm", "cm"],
                 # Voxel spacing along each dimension.
-                scales=[1, 10, 10, 10],
+                scales=[10, 10, 10],
             ),
         ),
     )
@@ -48,10 +50,14 @@ def try_loading_pickle():
     try:
         with open(pkl_path, "rb") as f:
             scatter_angle = np.load(f, allow_pickle=True)
+        scatter_angle = scatter_angle.astype(np.uint8)
     except Exception as e:
         print(e)
 
-    print(scatter_angle.shape)
+    print(f"scatter_angle.shape: {scatter_angle.shape}")
+    print(f"scatter_angle.dtype: {scatter_angle.dtype}")
+    # print(f"scatter_angle.min: {scatter_angle.min()}")
+    # print(f"scatter_angle.max: {scatter_angle.max()}")
 
 
 if __name__ == "__main__":
