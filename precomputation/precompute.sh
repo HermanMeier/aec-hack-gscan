@@ -82,7 +82,6 @@ if ! jq ".scales[].encoding" "$output_dir_path/info" | grep -q jpeg; then
   log "INFO" "Converting raw chunks to JPEG"
   generate-scales-info --encoding=jpeg "$output_dir_path"/info jpeg/
   convert-chunks --flat "$output_dir_path"/ jpeg/
-fi
 
 flatten_directory() {
   local dir="$1"
