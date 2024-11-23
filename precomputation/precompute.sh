@@ -71,8 +71,17 @@ if [ ! -d "$output_dir_path" ]; then
   if ! compute-scales "$output_dir_path/"; then
     error_exit "Failed to compute scales."
   fi
+
 else
   log "INFO" "Output directory already exists: $output_dir_path. Skipping processing."
+fi
+
+
+# Convert if encoding not already JPEG
+if ! jq ".scales[].encoding" "$output_dir_path/info" | grep -q jpeg; then
+  log "INFO" "Converting raw chunks to JPEG"
+  generate-scales-info --encoding=jpeg "$output_dir_path"/info jpeg/
+  convert-chunks --flat "$output_dir_path"/ jpeg/
 fi
 
 flatten_directory() {
@@ -89,7 +98,6 @@ flatten_directory() {
 
 folders=$(find "$output_dir_path" -maxdepth 1 -mindepth 1 -type d)
 for folder in $folders; do
-  log "INFO" "Flattening folder: $folder"
   flatten_directory "$folder"
 done
 
