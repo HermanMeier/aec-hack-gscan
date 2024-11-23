@@ -27,6 +27,7 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
     const [endPoint, setEndPoint] = useState<Point | null>(null);
     const [isMeasuring, setIsMeasuring] = useState(false);
     const [temporaryEndPoint, setTemporaryEndPoint] = useState<Point | null>(null);
+    const [isMouseDown, setIsMouseDown] = useState(false);
 
     const calculateDistance = useCallback((point1: Point, point2: Point): number => {
         const dx = point2.x - point1.x;
@@ -43,8 +44,8 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
         }
     }, [isMeasuring, viewer.mouseState.position]);
 
-    const handleClick = useCallback (() => {
-        if (!viewer.mouseState.position) return;
+    const handleMouseUp = useCallback(() => {
+        if (!isActive || !viewer.mouseState.position) return;
 
         const [x, y, z] = viewer.mouseState.position;
         const currentPoint = { x, y, z };
@@ -56,17 +57,21 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
             setEndPoint(currentPoint);
             setIsMeasuring(false);
         }
-    },[startPoint, isMeasuring, viewer.mouseState.position]);
 
+        setIsMouseDown(false);
+    }, [isActive, isMouseDown, startPoint, isMeasuring, viewer.mouseState.position]);
 
     useEffect(() => {
         if (!isActive) return;
-        // Only add the click listener to mouseState.changed
-        viewer.mouseState.changed.add(handleClick);
+
+        // Add event listeners to the document
+        document.addEventListener('mouseup', handleMouseUp);
+
         return () => {
-            viewer.mouseState.changed.remove(handleClick);
+            // Clean up event listeners
+            document.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isActive, isMeasuring, startPoint, handleClick]);
+    }, [isActive, handleMouseUp]);
 
     const handleReset = useCallback(() => {
         setStartPoint(null);
