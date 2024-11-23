@@ -1,9 +1,16 @@
 [project]
 name = "aec-hack-gscan"
 version = "0.1.0"
-description = "Add your description here"
+description = "Python server for generating slices of voxel data."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "neuroglancer-scripts>=1.2.0",
+    "neuroglancer>=2.40.1",
+]
+
+[dependency-groups]
+dev = [
+    "jupyter>=1.1.1",
+    "tensorstore>=0.1.68",
 ]
