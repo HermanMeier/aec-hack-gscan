@@ -3,24 +3,26 @@
 input_nifti_file_path='../data/aec_hackathon_gscan_example_data.nii'
 output_dir_path='./output'
 
-# Generate info
-volume-to-precomputed \
-  --generate-info \
-  $input_nifti_file_path \
-  $output_dir_path/
+if [ ! -d "$output_dir_path" ]; then
+  # Generate info
+  volume-to-precomputed \
+    --generate-info \
+    $input_nifti_file_path \
+    $output_dir_path/
 
-# Updating data_type
-jq '.data_type = "uint8"' $output_dir_path/info_fullres.json >tmp.json
-mv tmp.json $output_dir_path/info_fullres.json
+  # Updating data_type
+  jq '.data_type = "uint8"' $output_dir_path/info_fullres.json >tmp.json
+  mv tmp.json $output_dir_path/info_fullres.json
 
-# Generate scales info
-generate-scales-info $output_dir_path/info_fullres.json $output_dir_path/
+  # Generate scales info
+  generate-scales-info $output_dir_path/info_fullres.json $output_dir_path/
 
-# Precomputation
-volume-to-precomputed $input_nifti_file_path $output_dir_path/
+  # Precomputation
+  volume-to-precomputed $input_nifti_file_path $output_dir_path/
 
-# Computing scales
-compute-scales $output_dir_path/
+  # Computing scales
+  compute-scales $output_dir_path/
+fi
 
 # Flattening
 flatten_directory() {
