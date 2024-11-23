@@ -141,9 +141,7 @@ echo "flattening completed."
 
 ### Unzipping
 
-In case the files are unzipped, we can simply run the oneliner
+In case the files are zipped, we can simply run the oneliner
 ```bash
 find 80mm/ -type f -name '*.gz' -exec gzip -d {} +
 ```
-
-

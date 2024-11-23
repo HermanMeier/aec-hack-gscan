@@ -2,6 +2,7 @@
 
 input_nifti_file_path='../data/aec_hackathon_gscan_example_data.nii'
 output_dir_path='./output'
+rm -rf $output_dir_path
 
 # Generate info
 volume-to-precomputed \
@@ -36,17 +37,16 @@ flatten_directory() {
   find "$dir" -type d -empty -delete
 }
 
-for folder in "$output_dir_path"/*/; do
-  if [ -d "$folder" ]; then
-    echo "processing folder: $folder"
-    flatten_directory "$folder"
-  fi
+folders=$(find "$output_dir_path" -maxdepth 1 -mindepth 1 -type d)
+for folder in $folders; do
+  echo "Flatten folder: $folder"
+  flatten_directory "$folder"
 done
 
 # Unzipping
 decompress_gz_in_folder() {
   local dir="$1"
-  echo "processing folder: $dir"
+  echo "Decompressing folder: $dir"
   find "$dir" -type f -name '*.gz' -exec gzip -d {} +
 }
 
