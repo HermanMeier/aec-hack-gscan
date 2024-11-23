@@ -12,3 +12,11 @@ will only have an effect on later visualization, not the NIfTI generation.
 ## Installing poetry dependencies
 
 * `poetry install`
+
+## Running Using Poetry
+
+Run the following commands in the same folder as this README
+
+* `poetry install`
+* `poetry run nifti-generator -i input_reconstruction.pickle`
+    * For more options, see:`poetry run nifti-generator --help
