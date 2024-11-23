@@ -45,7 +45,6 @@ log "INFO" "Starting script execution."
 
 if [ ! -d "$output_dir_path" ]; then
   log "INFO" "Output directory not found. Creating and processing: $output_dir_path"
-
   log "INFO" "Generating info for $input_nifti_file_path"
   if ! volume-to-precomputed --generate-info "$input_nifti_file_path" "$output_dir_path/"; then
     error_exit "Failed to generate info for $input_nifti_file_path"
@@ -75,6 +74,14 @@ else
   log "INFO" "Output directory already exists: $output_dir_path. Skipping processing."
 fi
 
+
+# Convert if encoding not already JPEG
+if ! jq ".scales[].encoding" "$output_dir_path/info" | grep -q jpeg; then
+  log "INFO" "Converting raw chunks to JPEG"
+  generate-scales-info --encoding=jpeg "$output_dir_path"/info jpeg/
+  convert-chunks --flat "$output_dir_path"/ jpeg/
+fi
+
 flatten_directory() {
   local dir="$1"
   log "INFO" "Flattening directory: $dir"
@@ -89,7 +96,6 @@ flatten_directory() {
 
 folders=$(find "$output_dir_path" -maxdepth 1 -mindepth 1 -type d)
 for folder in $folders; do
-  log "INFO" "Flattening folder: $folder"
   flatten_directory "$folder"
 done
 
