@@ -1,4 +1,5 @@
 import argparse
+import time
 
 import neuroglancer
 import neuroglancer.cli
@@ -6,7 +7,7 @@ import numpy as np
 
 
 def add_example_layers(state):
-    a = np.zeros((3, 100, 100, 100), dtype=np.uint8)
+    a = np.zeros((3, 200, 300, 500), dtype=np.uint8)
     ix, iy, iz = np.meshgrid(
         *[np.linspace(0, 1, n) for n in a.shape[1:]], indexing="ij"
     )
@@ -19,6 +20,7 @@ def add_example_layers(state):
         dtype=np.uint32,
     )
     b = np.pad(b, 1, "constant")
+
     dimensions = neuroglancer.CoordinateSpace(
         names=["x", "y", "z"], units="nm", scales=[10, 10, 10]
     )
@@ -68,3 +70,8 @@ if __name__ == "__main__":
     with viewer.txn() as s:
         a, b = add_example_layers(s)
     print(viewer)
+    try:
+        while True:
+            time.sleep(100)  # Sleep to reduce CPU usage
+    except KeyboardInterrupt:
+        print("\nServer stopped by user.")
