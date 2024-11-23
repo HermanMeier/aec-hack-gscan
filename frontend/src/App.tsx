@@ -1,15 +1,22 @@
 import './App.css'
 import "neuroglancer";
-import Neuroglancer from "./Neuroglancer.tsx";
+import {createBrowserRouter, RouterProvider,} from "react-router";
+import SliceView from "./views/SliceView.tsx";
 
 function App() {
 
-  return (
-    <>
-        <p>Header</p>
-        <Neuroglancer/>
-    </>
-  )
+    const router = createBrowserRouter([
+        {
+            path: "/",
+            element: <SliceView/>,
+        },
+    ]);
+
+    return (
+        <>
+            <RouterProvider router={router}/>
+        </>
+    )
 }
 
 export default App
