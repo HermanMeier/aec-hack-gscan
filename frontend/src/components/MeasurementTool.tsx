@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Ruler } from 'lucide-react';
+import {useCallback, useEffect, useState} from 'react';
+import {Ruler} from 'lucide-react';
 
 interface Point {
     x: number;
@@ -36,7 +36,7 @@ interface MeasurementToolProps {
     viewer: Viewer;
 }
 
-export default function MeasurementTool({ mousePosition, isActive, viewer }: MeasurementToolProps) {
+export default function MeasurementTool({mousePosition, isActive, viewer}: MeasurementToolProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [startPoint, setStartPoint] = useState<Point | null>(null);
     const [endPoint, setEndPoint] = useState<Point | null>(null);
@@ -54,7 +54,7 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
     const handleMouseMove = useCallback((e: MouseEvent) => {
         if (isMeasuring && viewer.mouseState.position) {
             const [x, y, z] = viewer.mouseState.position;
-            setTemporaryEndPoint({ x, y, z });
+            setTemporaryEndPoint({x, y, z});
         }
     }, [isMeasuring, viewer.mouseState.position]);
 
@@ -62,7 +62,7 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
         if (!isActive || !viewer.mouseState.position) return;
 
         const [x, y, z] = viewer.mouseState.position;
-        const currentPoint = { x, y, z };
+        const currentPoint = {x, y, z};
 
         if (!startPoint) {
             setStartPoint(currentPoint);
@@ -113,26 +113,14 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
     }, [startPoint, endPoint, temporaryEndPoint, isMeasuring, calculateDistance, viewer.coordinateSpace.value.units]);
 
     return (
-        <div className="fixed bottom-4 right-4 flex flex-col items-end gap-4">
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`p-3 rounded-full shadow-lg transition-colors ${
-                    isActive
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                        : 'bg-gray-400 text-white/50 cursor-not-allowed'
-                }`}
-                title={isActive ? "Measurement Tool" : "Measurement Tool (Disabled)"}
-            >
-                <Ruler className="h-6 w-6" />
-            </button>
-
+        <div className="fixed bottom-4 left-4 flex flex-col items-start gap-4 z-10">
             {isOpen && (
                 <div className="w-64 bg-black/50 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden">
                     <div className="flex items-center justify-between p-3 border-b border-white/10">
                         <h3 className="text-white font-semibold text-sm">Measurement Tool</h3>
                         <button
                             onClick={handleReset}
-                            className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
+                            className="px-2 py-1 hover:bg-red-700 text-white text-xs rounded transition-colors bg-red-600"
                         >
                             Reset
                         </button>
@@ -144,6 +132,17 @@ export default function MeasurementTool({ mousePosition, isActive, viewer }: Mea
                     </div>
                 </div>
             )}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`float-left p-3 rounded-full shadow-lg transition-colors ${
+                    isActive && isMeasuring
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-gray-400 text-white/50 cursor-pointer'
+                }`}
+                title={isActive ? "Measurement Tool" : "Measurement Tool (Disabled)"}
+            >
+                <Ruler className="h-6 w-6"/>
+            </button>
         </div>
     );
 }
