@@ -5,7 +5,12 @@ description = "Python server for generating slices of voxel data."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "jupyter>=1.1.1",
+    "neuroglancer-scripts>=1.2.0",
     "neuroglancer>=2.40.1",
+]
+
+[dependency-groups]
+dev = [
+    "jupyter>=1.1.1",
     "tensorstore>=0.1.68",
 ]
