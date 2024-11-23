@@ -9,6 +9,10 @@ volume-to-precomputed \
   $input_nifti_file_path \
   $output_dir_path/
 
+# Updating data_type
+jq '.data_type = "uint8"' $output_dir_path/info_fullres.json >tmp.json
+mv tmp.json $output_dir_path/info_fullres.json
+
 # Generate scales info
 generate-scales-info $output_dir_path/info_fullres.json $output_dir_path/
 
@@ -32,7 +36,7 @@ flatten_directory() {
   find "$dir" -type d -empty -delete
 }
 
-for folder in */; do
+for folder in "$output_dir_path"/*/; do
   if [ -d "$folder" ]; then
     echo "processing folder: $folder"
     flatten_directory "$folder"

@@ -50,6 +50,12 @@ volume-to-precomputed \
     <input-nifti-file-path>.nii.gz \
     <output-dir-name>/`
 ```
+
+*CRUCIAL*: we need to change `data_type` to `uint8` here.
+
+```bash
+jq '.data_type = "uint8"' <output-dir-name>/info_fullres.json > tmp.json && mv tmp.json <output-dir-name>/info_fullres.json
+```
 2. Generating scales info
 ```bash
 generate-scales-info <output-dir-name>/info_fullres.json <output-dir-name>/
