@@ -1,0 +1,10 @@
+[project]
+name = "aec-hack-gscan"
+version = "0.1.0"
+description = "Overarching Python project for the GScan AEC Hackathon."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv.workspace]
+members = ["nifti-generator", "precomputation", "neuroglancer-pyapp"]
