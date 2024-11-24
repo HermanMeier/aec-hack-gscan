@@ -1,11 +1,10 @@
 [project]
-name = "aec-hack-gscan"
+name = "neuroglancer-pyapp"
 version = "0.1.0"
-description = "Python server for generating slices of voxel data."
+description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "neuroglancer-scripts>=1.2.0",
     "neuroglancer>=2.40.1",
 ]
 
